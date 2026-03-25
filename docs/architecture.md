@@ -13,7 +13,6 @@ The architecture is designed to satisfy the attached business rules, status life
 
 ## 2. Scope
 
-### In scope
 - Submit orders manually from the UI.
 - Submit orders in batch via CSV.
 - Validate every order using strict rules.
@@ -21,13 +20,6 @@ The architecture is designed to satisfy the attached business rules, status life
 - Match orders using price-time priority.
 - Produce execution reports with statuses: `New`, `Reject`, `Fill`, `PFill`.
 - Display and download execution reports in the frontend.
-
-### Out of scope (phase 1)
-- Order cancellation/amendment.
-- Multi-node matching engine distribution.
-- Advanced order types (market, iceberg, stop, etc.).
-- User auth/roles beyond basic app access.
-
 ---
 
 ## 3. Canonical Business Rules

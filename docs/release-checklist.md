@@ -2,14 +2,14 @@
 
 ## Documentation
 - [ ] API contract reviewed against frontend usage.
-- [ ] Setup instructions validated on clean environment.
+- [x] Setup instructions validated on clean environment.
 - [ ] Known limitations documented for Phase 1 scope.
 
 ## Quality and Testing
-- [ ] Unit tests pass for validation, order book, and matching.
-- [ ] Integration tests pass for auth, order flow, batch flow, and realtime events.
-- [ ] Acceptance test for Example 6 passes.
-- [ ] Performance smoke test is executed and recorded.
+- [x] Unit tests pass for validation, order book, and matching.
+- [x] Integration tests pass for auth, order flow, batch flow, and realtime events.
+- [x] Acceptance test for Example 6 passes.
+- [x] Performance smoke test is executed and recorded.
 
 ## Operations
 - [ ] Rollback plan documented.
