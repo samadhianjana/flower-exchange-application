@@ -12,7 +12,7 @@
 
 ## POST `/api/orders/batch`
 - Request:
-  - CSV payload with columns: `ClientOrderID,Instrument,Side,Price,Quantity`
+  - CSV payload with columns: `Cl. Ord.ID,Instrument,Side,Price,Quantity`
   - `batchId` (string)
 - Response:
   - `batchId`
