@@ -38,7 +38,11 @@ void RunBatchFlowIntegrationTests() {
       api::SubmitBatchOrders(&service, csv, "batch-001", login->token, api::IsAuthenticated);
   assert(!reports.empty());
 
-  std::string report_output_path = "execution_report.csv";
+  const std::filesystem::path testdata_dir =
+      std::filesystem::path(__FILE__).parent_path().parent_path() / "testdata";
+  const std::filesystem::path exec_reports_dir = testdata_dir / "exec_reports";
+
+  std::string report_output_path = (exec_reports_dir / "execution_report.csv").string();
   if (const char* explicit_output = std::getenv("FLOWER_EXCHANGE_REPORT_OUTPUT_PATH");
       explicit_output != nullptr && *explicit_output != '\0') {
     report_output_path = explicit_output;
@@ -46,8 +50,10 @@ void RunBatchFlowIntegrationTests() {
              csv_path != nullptr && *csv_path != '\0') {
     std::filesystem::path input_path(csv_path);
     const auto output_name = input_path.stem().string() + "_execution_report.csv";
-    report_output_path = (input_path.parent_path() / output_name).string();
+    report_output_path = (exec_reports_dir / output_name).string();
   }
+
+  std::filesystem::create_directories(std::filesystem::path(report_output_path).parent_path());
 
   std::ofstream output(report_output_path, std::ios::trunc);
   assert(output.good());
