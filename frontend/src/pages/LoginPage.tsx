@@ -19,26 +19,40 @@ export function LoginPage() {
   };
 
   return (
-    <div style={{ maxWidth: 420, margin: "4rem auto", padding: "1rem" }}>
-      <h2>Login</h2>
-      <p>Use username admin for Admin role. Any non-empty password is accepted.</p>
-      <input
-        placeholder="username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        style={{ display: "block", marginBottom: 8, width: "100%" }}
-      />
-      <input
-        placeholder="password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        style={{ display: "block", marginBottom: 8, width: "100%" }}
-      />
-      <button onClick={onSubmit} disabled={isSubmitting}>
-        {isSubmitting ? "Signing in..." : "Sign in"}
-      </button>
-      <div style={{ marginTop: 8 }}>{message}</div>
+    <div className="app-shell">
+      <div className="mx-auto mt-16 max-w-md panel">
+        <div className="panel-header">
+          <h2 className="text-xl">Login</h2>
+          <p className="page-subtitle mt-1">Use username admin for Admin role. Any non-empty password is accepted.</p>
+        </div>
+        <div className="panel-body space-y-3">
+          <div className="field">
+            <label className="field-label" htmlFor="username">Username</label>
+            <input
+              id="username"
+              className="input-field"
+              placeholder="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
+          <div className="field">
+            <label className="field-label" htmlFor="password">Password</label>
+            <input
+              id="password"
+              className="input-field"
+              placeholder="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <button className="btn-primary w-full justify-center" onClick={onSubmit} disabled={isSubmitting}>
+            {isSubmitting ? "Signing in..." : "Sign in"}
+          </button>
+          <div className="helper-text">{message}</div>
+        </div>
+      </div>
     </div>
   );
 }

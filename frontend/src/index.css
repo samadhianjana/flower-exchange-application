@@ -1,0 +1,161 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+@layer base {
+  body {
+    @apply min-h-screen bg-fintech-bg text-fintech-text antialiased;
+    background-image: radial-gradient(circle at top left, #dce7ff 0%, transparent 30%),
+      radial-gradient(circle at bottom right, #e8f0ff 0%, transparent 36%);
+    font-family: "Segoe UI", "Inter", "Roboto", sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-semibold tracking-tight text-fintech-text;
+  }
+
+  p,
+  span,
+  li,
+  td,
+  th,
+  label,
+  input,
+  select,
+  button {
+    @apply text-sm;
+  }
+}
+
+@layer components {
+  .app-shell {
+    @apply mx-auto max-w-7xl px-4 py-6 md:px-8;
+  }
+
+  .page-title {
+    @apply text-2xl md:text-3xl;
+  }
+
+  .page-subtitle {
+    @apply text-fintech-muted;
+  }
+
+  .panel {
+    @apply rounded-xl border border-fintech-line bg-fintech-panel shadow-panel;
+  }
+
+  .panel-header {
+    @apply border-b border-fintech-line px-4 py-3;
+  }
+
+  .panel-body {
+    @apply px-4 py-4;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center rounded-md bg-fintech-brand px-3 py-2 font-medium text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center rounded-md border border-fintech-line bg-white px-3 py-2 font-medium text-fintech-text transition hover:bg-fintech-brandSoft;
+  }
+
+  .field {
+    @apply flex flex-col gap-1;
+  }
+
+  .field-label {
+    @apply text-xs font-medium uppercase tracking-wide text-fintech-muted;
+  }
+
+  .input-field {
+    @apply rounded-md border border-fintech-line bg-white px-3 py-2 text-fintech-text outline-none transition focus:border-fintech-brand focus:ring-2 focus:ring-fintech-brand/20;
+  }
+
+  .select-field {
+    @apply rounded-md border border-fintech-line bg-white px-3 py-2 text-fintech-text outline-none transition focus:border-fintech-brand focus:ring-2 focus:ring-fintech-brand/20;
+  }
+
+  .helper-text {
+    @apply text-xs text-fintech-muted;
+  }
+
+  .status-ok {
+    @apply text-fintech-success;
+  }
+
+  .status-error {
+    @apply text-fintech-danger;
+  }
+
+  .chip-grid {
+    @apply grid gap-3 sm:grid-cols-2 lg:grid-cols-3;
+  }
+
+  .metric-chip {
+    @apply rounded-lg border border-fintech-line bg-white px-4 py-3;
+  }
+
+  .metric-label {
+    @apply text-xs uppercase tracking-wide text-fintech-muted;
+  }
+
+  .metric-value {
+    @apply mt-1 text-xl font-semibold;
+  }
+
+  .toolbar {
+    @apply flex flex-wrap items-end gap-3;
+  }
+
+  .table-shell {
+    @apply w-full overflow-x-auto rounded-lg border border-fintech-line;
+  }
+
+  .table {
+    @apply min-w-full border-collapse bg-white;
+  }
+
+  .table thead {
+    @apply bg-slate-100;
+  }
+
+  .table th {
+    @apply border-b border-fintech-line px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-fintech-muted;
+  }
+
+  .table td {
+    @apply border-b border-slate-100 px-3 py-2 text-sm;
+  }
+
+  .table tbody tr:hover {
+    @apply bg-fintech-brandSoft/40;
+  }
+
+  .status-badge {
+    @apply inline-flex rounded-full px-2 py-0.5 text-xs font-medium;
+  }
+
+  .status-new {
+    @apply bg-slate-200 text-slate-700;
+  }
+
+  .status-rejected {
+    @apply bg-red-100 text-red-700;
+  }
+
+  .status-fill {
+    @apply bg-emerald-100 text-emerald-700;
+  }
+
+  .status-pfill {
+    @apply bg-amber-100 text-amber-700;
+  }
+}

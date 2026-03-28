@@ -72,27 +72,37 @@ export default function App() {
       {!isAuthenticated ? (
         <LoginPage />
       ) : (
-        <div style={{ padding: "1rem" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-            <h1 style={{ margin: 0 }}>Flower Exchange Platform</h1>
-            <div>
-              <span style={{ marginRight: 12 }}>
+        <div className="app-shell space-y-4">
+          <div className="panel">
+            <div className="panel-body flex flex-wrap items-center justify-between gap-3">
+              <h1 className="page-title">Flower Exchange Platform</h1>
+              <div className="flex items-center gap-3">
+                <span className="text-fintech-muted">
                 {username} ({role})
               </span>
-              <button onClick={value.logout}>Logout</button>
+                <button className="btn-secondary" onClick={value.logout}>
+                  Logout
+                </button>
+              </div>
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
-            <button onClick={() => setView("dashboard")}>Dashboard</button>
-            <button onClick={() => setView("manual")}>Manual Order</button>
-            <button onClick={() => setView("batch")}>Batch Upload</button>
-            <button onClick={() => setView("reports")}>Execution Reports</button>
-            <button onClick={() => setView("book")}>Order Book</button>
-            {role === "Admin" ? <button onClick={() => setView("admin")}>Admin</button> : null}
+          <div className="panel">
+            <div className="panel-body flex flex-wrap gap-2">
+              <button className="btn-secondary" onClick={() => setView("dashboard")}>Dashboard</button>
+              <button className="btn-secondary" onClick={() => setView("manual")}>Manual Order</button>
+              <button className="btn-secondary" onClick={() => setView("batch")}>Batch Upload</button>
+              <button className="btn-secondary" onClick={() => setView("reports")}>Execution Reports</button>
+              <button className="btn-secondary" onClick={() => setView("book")}>Order Book</button>
+              {role === "Admin" ? (
+                <button className="btn-secondary" onClick={() => setView("admin")}>Admin</button>
+              ) : null}
+            </div>
           </div>
 
-          {renderContent()}
+          <div className="panel">
+            <div className="panel-body">{renderContent()}</div>
+          </div>
         </div>
       )}
     </AuthContext.Provider>
