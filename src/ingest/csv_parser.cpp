@@ -103,8 +103,8 @@ std::vector<flower_exchange::Order> ParseOrdersCsv(const std::string& csv) {
     o.client_order_id = columns[client_order_id_index];
     o.instrument = columns[instrument_index];
     try {
-      o.side = (std::stoi(columns[side_index]) == 1) ? flower_exchange::Side::Buy
-                                                     : flower_exchange::Side::Sell;
+      const int parsed_side = std::stoi(columns[side_index]);
+      o.side = static_cast<flower_exchange::Side>(parsed_side);
       o.price = std::stod(columns[price_index]);
       o.original_qty = std::stoi(columns[qty_index]);
     } catch (...) {
