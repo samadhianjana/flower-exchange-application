@@ -67,6 +67,9 @@ export default function App() {
     }
   };
 
+  const getNavButtonClass = (targetView: View) =>
+    view === targetView ? "btn-secondary btn-nav-active" : "btn-secondary";
+
   return (
     <AuthContext.Provider value={value}>
       {!isAuthenticated ? (
@@ -89,13 +92,13 @@ export default function App() {
 
           <div className="panel">
             <div className="panel-body flex flex-wrap gap-2">
-              <button className="btn-secondary" onClick={() => setView("dashboard")}>Dashboard</button>
-              <button className="btn-secondary" onClick={() => setView("manual")}>Manual Order</button>
-              <button className="btn-secondary" onClick={() => setView("batch")}>Batch Upload</button>
-              <button className="btn-secondary" onClick={() => setView("reports")}>Execution Reports</button>
-              <button className="btn-secondary" onClick={() => setView("book")}>Order Book</button>
+              <button className={getNavButtonClass("dashboard")} onClick={() => setView("dashboard")}>Dashboard</button>
+              <button className={getNavButtonClass("manual")} onClick={() => setView("manual")}>Manual Order</button>
+              <button className={getNavButtonClass("batch")} onClick={() => setView("batch")}>Batch Upload</button>
+              <button className={getNavButtonClass("reports")} onClick={() => setView("reports")}>Execution Report</button>
+              <button className={getNavButtonClass("book")} onClick={() => setView("book")}>Order Book</button>
               {role === "Admin" ? (
-                <button className="btn-secondary" onClick={() => setView("admin")}>Admin</button>
+                <button className={getNavButtonClass("admin")} onClick={() => setView("admin")}>Admin</button>
               ) : null}
             </div>
           </div>

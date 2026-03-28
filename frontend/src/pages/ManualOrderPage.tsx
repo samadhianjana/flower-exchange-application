@@ -1,43 +1,98 @@
 import React, { useState } from "react";
-import { apiClient, execStatusLabel, Instrument, ReportRow, Side } from "../services/apiClient";
+import { apiClient, Instrument, OrderInput, Side } from "../services/apiClient";
+
+type QueuedOrder = OrderInput & { id: number };
 
 export function ManualOrderPage() {
   const [clientOrderId, setClientOrderId] = useState("");
-  const [instrument, setInstrument] = useState<Instrument>("Rose");
-  const [side, setSide] = useState<1 | 2>(1);
-  const [price, setPrice] = useState(45);
-  const [quantity, setQuantity] = useState(100);
+  const [instrument, setInstrument] = useState<Instrument | "">("");
+  const [side, setSide] = useState<Side | "">("");
+  const [price, setPrice] = useState<string>("");
+  const [quantity, setQuantity] = useState<string>("");
   const [status, setStatus] = useState("");
-  const [reports, setReports] = useState<ReportRow[]>([]);
+  const [queuedOrders, setQueuedOrders] = useState<QueuedOrder[]>([]);
+  const [validationHints, setValidationHints] = useState<string[]>([]);
 
-  const validationHints: string[] = [];
-  if (!/^[a-zA-Z0-9]{1,7}$/.test(clientOrderId)) {
-    validationHints.push("Client Order ID must be alphanumeric, max 7 chars.");
-  }
-  if (price <= 0) {
-    validationHints.push("Price must be greater than 0.");
-  }
-  if (quantity < 10 || quantity > 1000 || quantity % 10 !== 0) {
-    validationHints.push("Quantity must be 10..1000 and a multiple of 10.");
-  }
-
-  const onSubmit = async () => {
-    if (validationHints.length > 0) {
-      setStatus("Fix validation errors before submitting.");
-      return;
+  const getValidationHints = (): string[] => {
+    const hints: string[] = [];
+    if (!/^[a-zA-Z0-9]{1,7}$/.test(clientOrderId)) {
+      hints.push("Client Order ID must be alphanumeric, max 7 chars.");
     }
-    const response = await apiClient.submitOrder({ clientOrderId, instrument, side, price, quantity });
-    setStatus(response.message);
-    setReports(response.reports);
+    if (!instrument) {
+      hints.push("Instrument is required.");
+    }
+    if (side !== 1 && side !== 2) {
+      hints.push("Side is required.");
+    }
+
+    const parsedPrice = Number(price);
+    const parsedQty = Number(quantity);
+    if (!Number.isFinite(parsedPrice) || parsedPrice <= 0) {
+      hints.push("Price must be greater than 0.");
+    }
+    if (!Number.isFinite(parsedQty) || parsedQty < 10 || parsedQty > 1000 || parsedQty % 10 !== 0) {
+      hints.push("Quantity must be 10..1000 and a multiple of 10.");
+    }
+    return hints;
   };
 
-  const statusTone = status.toLowerCase().includes("error") || status.toLowerCase().includes("fix") ? "status-error" : "status-ok";
+  const resetForm = () => {
+    setClientOrderId("");
+    setInstrument("");
+    setSide("");
+    setPrice("");
+    setQuantity("");
+  };
+
+  const onAddOrder = () => {
+    const hints = getValidationHints();
+    if (hints.length > 0) {
+      setValidationHints(hints);
+      setStatus("Fix validation errors before adding.");
+      return;
+    }
+
+    const nextOrder: QueuedOrder = {
+      id: Date.now() + Math.floor(Math.random() * 1000),
+      clientOrderId,
+      instrument: instrument as Instrument,
+      side: side as Side,
+      price: Number(price),
+      quantity: Number(quantity)
+    };
+    setQueuedOrders((prev) => [...prev, nextOrder]);
+    setValidationHints([]);
+    resetForm();
+    setStatus("Order queued. Add more orders or click Process.");
+  };
+
+  const onRemoveQueuedOrder = (id: number) => {
+    setQueuedOrders((prev) => prev.filter((order) => order.id !== id));
+  };
+
+  const onProcess = async () => {
+    if (queuedOrders.length === 0) {
+      setStatus("Add at least one order before processing.");
+      return;
+    }
+
+    const payload: OrderInput[] = queuedOrders.map(({ id: _id, ...order }) => order);
+    const response = await apiClient.processManualOrders(payload);
+    setQueuedOrders([]);
+    setStatus(`${response.message}. Execution reports updated in the Execution Report tab.`);
+  };
+
+  const statusTone =
+    status.toLowerCase().includes("error") ||
+    status.toLowerCase().includes("fix") ||
+    status.toLowerCase().includes("no manual orders")
+      ? "status-error"
+      : "status-ok";
 
   return (
     <div className="space-y-4">
       <div>
         <h2 className="text-xl">Manual Order Entry</h2>
-        <p className="page-subtitle mt-1">Submit and immediately review execution reports.</p>
       </div>
 
       <div className="toolbar">
@@ -59,6 +114,7 @@ export function ManualOrderPage() {
             value={instrument}
             onChange={(e) => setInstrument(e.target.value as Instrument)}
           >
+            <option value="">Select instrument</option>
             <option>Rose</option>
             <option>Lavender</option>
             <option>Lotus</option>
@@ -68,9 +124,15 @@ export function ManualOrderPage() {
         </div>
         <div className="field min-w-[8rem]">
           <label className="field-label" htmlFor="side">Side</label>
-          <select id="side" className="select-field" value={side} onChange={(e) => setSide(Number(e.target.value) as Side)}>
-            <option value={1}>Buy</option>
-            <option value={2}>Sell</option>
+          <select
+            id="side"
+            className="select-field"
+            value={side}
+            onChange={(e) => setSide(e.target.value === "" ? "" : (Number(e.target.value) as Side))}
+          >
+            <option value="">Select side</option>
+            <option value={1}>1 (Buy)</option>
+            <option value={2}>2 (Sell)</option>
           </select>
         </div>
         <div className="field min-w-[8rem]">
@@ -80,7 +142,8 @@ export function ManualOrderPage() {
             className="input-field"
             type="number"
             value={price}
-            onChange={(e) => setPrice(Number(e.target.value))}
+            onChange={(e) => setPrice(e.target.value)}
+            placeholder="Price"
           />
         </div>
         <div className="field min-w-[8rem]">
@@ -90,11 +153,15 @@ export function ManualOrderPage() {
             className="input-field"
             type="number"
             value={quantity}
-            onChange={(e) => setQuantity(Number(e.target.value))}
+            onChange={(e) => setQuantity(e.target.value)}
+            placeholder="Quantity"
           />
         </div>
-        <button className="btn-primary" onClick={onSubmit}>
-          Submit
+        <button className="btn-primary" onClick={onAddOrder}>
+          Add Order
+        </button>
+        <button className="btn-secondary" onClick={onProcess} disabled={queuedOrders.length === 0}>
+          Process
         </button>
       </div>
 
@@ -108,34 +175,41 @@ export function ManualOrderPage() {
 
       <div className={statusTone}>{status}</div>
 
-      {reports.length > 0 ? (
+      {queuedOrders.length > 0 ? (
         <div className="table-shell">
           <table className="table">
             <thead>
               <tr>
                 <th>Client Order ID</th>
-                <th>Order ID</th>
-                <th>Status</th>
-                <th>Qty</th>
+                <th>Instrument</th>
+                <th>Side</th>
                 <th>Price</th>
-                <th>Reason</th>
+                <th>Qty</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              {reports.map((report, index) => (
-                <tr key={`${report.orderId}-${index}`}>
-                  <td>{report.clientOrderId}</td>
-                  <td>{report.orderId}</td>
-                  <td>{execStatusLabel(report.status)}</td>
-                  <td>{report.quantity}</td>
-                  <td>{report.price}</td>
-                  <td>{report.reason ?? ""}</td>
+              {queuedOrders.map((order) => (
+                <tr key={order.id}>
+                  <td>{order.clientOrderId}</td>
+                  <td>{order.instrument}</td>
+                  <td>{order.side}</td>
+                  <td>{order.price}</td>
+                  <td>{order.quantity}</td>
+                  <td>
+                    <button className="btn-secondary" onClick={() => onRemoveQueuedOrder(order.id)}>
+                      Remove
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      ) : null}
+      ) : (
+        <div className="helper-text">No queued orders yet.</div>
+      )}
+
     </div>
   );
 }

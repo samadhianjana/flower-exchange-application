@@ -61,7 +61,7 @@ export function ExecutionReportsPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-xl">Execution Reports</h2>
+        <h2 className="text-xl">Execution Report</h2>
       </div>
       <div className="toolbar">
         <input
@@ -101,29 +101,29 @@ export function ExecutionReportsPage() {
         <table className="table">
           <thead>
             <tr>
-              <th>Time</th>
-              <th>Client Order ID</th>
-              <th>Order ID</th>
+              <th>Cl. Ord.ID</th>
+              <th>OrderID</th>
               <th>Instrument</th>
               <th>Side</th>
               <th>Price</th>
-              <th>Qty</th>
+              <th>Quantity</th>
               <th>Status</th>
               <th>Reason</th>
+              <th>TransactionTime</th>
             </tr>
           </thead>
           <tbody>
             {reports.map((report, index) => (
               <tr key={`${report.orderId}-${report.transactionTime}-${index}`}>
-                <td>{report.transactionTime}</td>
                 <td>{report.clientOrderId}</td>
                 <td>{report.orderId}</td>
                 <td>{report.instrument}</td>
-                <td>{report.side === 1 ? "Buy" : "Sell"}</td>
+                <td>{report.side}</td>
                 <td>{report.price}</td>
                 <td>{report.quantity}</td>
                 <td><span className={getStatusClass(report.status)}>{execStatusLabel(report.status)}</span></td>
                 <td>{report.reason ?? ""}</td>
+                <td>{report.transactionTime}</td>
               </tr>
             ))}
           </tbody>

@@ -47,7 +47,7 @@ export function DashboardPage({ role, onNavigate }: DashboardPageProps) {
       <div className="flex flex-wrap gap-2">
         <button className="btn-primary" onClick={() => onNavigate("manual")}>Manual Order Entry</button>
         <button className="btn-secondary" onClick={() => onNavigate("batch")}>CSV Batch Upload</button>
-        <button className="btn-secondary" onClick={() => onNavigate("reports")}>Execution Reports</button>
+        <button className="btn-secondary" onClick={() => onNavigate("reports")}>Execution Report</button>
         <button className="btn-secondary" onClick={() => onNavigate("book")}>Order Book</button>
         {role === "Admin" ? (
           <button className="btn-secondary" onClick={() => onNavigate("admin")}>Admin Monitoring</button>
