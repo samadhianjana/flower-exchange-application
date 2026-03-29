@@ -51,16 +51,26 @@ export function ExecutionReportsPage() {
     setMessage(`CSV ready (${csv.length} bytes)`);
   };
 
+  const getStatusClass = (statusCode: ExecStatus) => {
+    if (statusCode === 0) return "status-badge status-new";
+    if (statusCode === 1) return "status-badge status-rejected";
+    if (statusCode === 2) return "status-badge status-fill";
+    return "status-badge status-pfill";
+  };
+
   return (
-    <div>
-      <h2>Execution Reports</h2>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+    <div className="space-y-4">
+      <div>
+        <h2 className="text-xl">Execution Report</h2>
+      </div>
+      <div className="toolbar">
         <input
+          className="input-field"
           placeholder="Client Order ID"
           value={clientOrderId}
           onChange={(e) => setClientOrderId(e.target.value)}
         />
-        <select value={instrument} onChange={(e) => setInstrument(e.target.value as Instrument | "") }>
+        <select className="select-field" value={instrument} onChange={(e) => setInstrument(e.target.value as Instrument | "") }>
           <option value="">All instruments</option>
           <option value="Rose">Rose</option>
           <option value="Lavender">Lavender</option>
@@ -69,6 +79,7 @@ export function ExecutionReportsPage() {
           <option value="Orchid">Orchid</option>
         </select>
         <select
+          className="select-field"
           value={typeof status === "number" ? String(status) : ""}
           onChange={(e) => setStatus(e.target.value === "" ? "" : (Number(e.target.value) as ExecStatus))}
         >
@@ -78,42 +89,46 @@ export function ExecutionReportsPage() {
           <option value="2">Fill</option>
           <option value="3">PFill</option>
         </select>
-        <button onClick={onDownload}>Download CSV</button>
+        <button className="btn-primary" onClick={onDownload}>Download CSV</button>
       </div>
-      <div>Rows: {reports.length}</div>
-      <div>Live status: {liveStatus}</div>
-      <div>{message}</div>
+      <div className="flex flex-wrap gap-4 text-fintech-muted">
+        <div>Rows: {reports.length}</div>
+        <div>Live status: {liveStatus}</div>
+        <div>{message}</div>
+      </div>
 
-      <table style={{ width: "100%", marginTop: 10, borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th>Time</th>
-            <th>Client Order ID</th>
-            <th>Order ID</th>
-            <th>Instrument</th>
-            <th>Side</th>
-            <th>Price</th>
-            <th>Qty</th>
-            <th>Status</th>
-            <th>Reason</th>
-          </tr>
-        </thead>
-        <tbody>
-          {reports.map((report, index) => (
-            <tr key={`${report.orderId}-${report.transactionTime}-${index}`}>
-              <td>{report.transactionTime}</td>
-              <td>{report.clientOrderId}</td>
-              <td>{report.orderId}</td>
-              <td>{report.instrument}</td>
-              <td>{report.side === 1 ? "Buy" : "Sell"}</td>
-              <td>{report.price}</td>
-              <td>{report.quantity}</td>
-              <td>{execStatusLabel(report.status)}</td>
-              <td>{report.reason ?? ""}</td>
+      <div className="table-shell">
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Cl. Ord.ID</th>
+              <th>OrderID</th>
+              <th>Instrument</th>
+              <th>Side</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Status</th>
+              <th>Reason</th>
+              <th>TransactionTime</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {reports.map((report, index) => (
+              <tr key={`${report.orderId}-${report.transactionTime}-${index}`}>
+                <td>{report.clientOrderId}</td>
+                <td>{report.orderId}</td>
+                <td>{report.instrument}</td>
+                <td>{report.side}</td>
+                <td>{report.price}</td>
+                <td>{report.quantity}</td>
+                <td><span className={getStatusClass(report.status)}>{execStatusLabel(report.status)}</span></td>
+                <td>{report.reason ?? ""}</td>
+                <td>{report.transactionTime}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

@@ -15,35 +15,44 @@ export function DashboardPage({ role, onNavigate }: DashboardPageProps) {
   }, []);
 
   return (
-    <div>
-      <h2>Dashboard</h2>
-      <p>Signed in as {role}</p>
-      <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 12 }}>
-        <div>Total reports: {metrics.totalReports}</div>
-        <div>Fills: {metrics.fills}</div>
-        <div>Partial fills: {metrics.partials}</div>
-        <div>Rejected: {metrics.rejected}</div>
-        <div>Batches: {metrics.batches}</div>
+    <div className="space-y-4">
+      <div>
+        <h2 className="text-xl">Dashboard</h2>
+        <p className="page-subtitle mt-1">Signed in as {role}</p>
       </div>
-      <ul>
-        <li>
-          <button onClick={() => onNavigate("manual")}>Manual Order Entry</button>
-        </li>
-        <li>
-          <button onClick={() => onNavigate("batch")}>CSV Batch Upload</button>
-        </li>
-        <li>
-          <button onClick={() => onNavigate("reports")}>Execution Reports</button>
-        </li>
-        <li>
-          <button onClick={() => onNavigate("book")}>Order Book</button>
-        </li>
+
+      <div className="chip-grid">
+        <div className="metric-chip">
+          <div className="metric-label">Total reports</div>
+          <div className="metric-value">{metrics.totalReports}</div>
+        </div>
+        <div className="metric-chip">
+          <div className="metric-label">Fills</div>
+          <div className="metric-value">{metrics.fills}</div>
+        </div>
+        <div className="metric-chip">
+          <div className="metric-label">Partial fills</div>
+          <div className="metric-value">{metrics.partials}</div>
+        </div>
+        <div className="metric-chip">
+          <div className="metric-label">Rejected</div>
+          <div className="metric-value">{metrics.rejected}</div>
+        </div>
+        <div className="metric-chip">
+          <div className="metric-label">Batches</div>
+          <div className="metric-value">{metrics.batches}</div>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <button className="btn-primary" onClick={() => onNavigate("manual")}>Manual Order Entry</button>
+        <button className="btn-secondary" onClick={() => onNavigate("batch")}>CSV Batch Upload</button>
+        <button className="btn-secondary" onClick={() => onNavigate("reports")}>Execution Report</button>
+        <button className="btn-secondary" onClick={() => onNavigate("book")}>Order Book</button>
         {role === "Admin" ? (
-          <li>
-            <button onClick={() => onNavigate("admin")}>Admin Monitoring</button>
-          </li>
+          <button className="btn-secondary" onClick={() => onNavigate("admin")}>Admin Monitoring</button>
         ) : null}
-      </ul>
+      </div>
     </div>
   );
 }

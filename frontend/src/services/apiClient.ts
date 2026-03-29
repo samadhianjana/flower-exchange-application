@@ -74,6 +74,14 @@ type LiveEvent =
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const instruments: Instrument[] = ["Rose", "Lavender", "Lotus", "Tulip", "Orchid"];
 
+const createEmptyBooks = (): Record<Instrument, { bids: RestingOrder[]; asks: RestingOrder[] }> => ({
+  Rose: { bids: [], asks: [] },
+  Lavender: { bids: [], asks: [] },
+  Lotus: { bids: [], asks: [] },
+  Tulip: { bids: [], asks: [] },
+  Orchid: { bids: [], asks: [] }
+});
+
 const statusLabel = (status: ExecStatus): string => {
   switch (status) {
     case 0:
@@ -113,18 +121,23 @@ const state: {
   nextSequenceNo: 1,
   reports: [],
   batches: [],
-  books: {
-    Rose: { bids: [], asks: [] },
-    Lavender: { bids: [], asks: [] },
-    Lotus: { bids: [], asks: [] },
-    Tulip: { bids: [], asks: [] },
-    Orchid: { bids: [], asks: [] }
-  },
+  books: createEmptyBooks(),
   listeners: new Set()
 };
 
 const emit = (event: LiveEvent) => {
   state.listeners.forEach((listener) => listener(event));
+};
+
+const emitOrderBookRefreshForAllInstruments = () => {
+  instruments.forEach((instrument) => emit({ type: "orderbook_update", payload: { instrument } }));
+};
+
+const resetForNewProcessingRun = () => {
+  state.nextOrderId = 1;
+  state.nextSequenceNo = 1;
+  state.reports = [];
+  state.books = createEmptyBooks();
 };
 
 const validateOrder = (payload: OrderInput): string | undefined => {
@@ -303,6 +316,10 @@ export const apiClient = {
   submitBatch: async (file: File) => {
     await delay(200);
     const text = await file.text();
+    resetForNewProcessingRun();
+    emit({ type: "report_update", payload: [] });
+    emitOrderBookRefreshForAllInstruments();
+
     const lines = text
       .split(/\r?\n/)
       .map((line) => line.trim())
@@ -417,10 +434,9 @@ export const apiClient = {
     state.batches.unshift(summary);
 
     if (allBatchReports.length > 0) {
-      const impactedInstruments = new Set<Instrument>(allBatchReports.map((r) => r.instrument));
       emit({ type: "report_update", payload: allBatchReports });
-      impactedInstruments.forEach((instrument) => emit({ type: "orderbook_update", payload: { instrument } }));
     }
+    emitOrderBookRefreshForAllInstruments();
     emit({ type: "batch_processed", payload: summary });
 
     return {
@@ -428,6 +444,42 @@ export const apiClient = {
       message: "Batch processed",
       summary,
       rowErrors
+    };
+  },
+
+  processManualOrders: async (orders: OrderInput[]) => {
+    await delay(120);
+    resetForNewProcessingRun();
+    emit({ type: "report_update", payload: [] });
+    emitOrderBookRefreshForAllInstruments();
+
+    if (orders.length === 0) {
+      return {
+        ok: false,
+        message: "No manual orders to process",
+        processed: 0,
+        rejected: 0,
+        reports: [] as ReportRow[]
+      };
+    }
+
+    const allReports: ReportRow[] = [];
+
+    orders.forEach((order) => {
+      const reports = processOrder(order);
+      allReports.push(...reports);
+    });
+
+    emit({ type: "report_update", payload: allReports });
+    emitOrderBookRefreshForAllInstruments();
+
+    const rejected = allReports.filter((r) => r.status === 1).length;
+    return {
+      ok: rejected === 0,
+      message: `Processed ${orders.length} manual order(s)` + (rejected > 0 ? ` (${rejected} rejected)` : ""),
+      processed: orders.length,
+      rejected,
+      reports: allReports
     };
   },
 
