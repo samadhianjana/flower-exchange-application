@@ -397,14 +397,16 @@ export const apiClient = {
         return;
       }
 
-      const side = parseSide(tokens[columnIndexes.side]);
+      const sideToken = tokens[columnIndexes.side];
+      const side = parseSide(sideToken);
+      const numericSide = Number(sideToken);
       const price = Number(tokens[columnIndexes.price]);
       const qty = Number(tokens[columnIndexes.quantity]);
 
       const order: OrderInput = {
         clientOrderId: tokens[columnIndexes.clientOrderId],
         instrument: tokens[columnIndexes.instrument] as Instrument,
-        side: side ?? 1,
+        side: (side ?? numericSide) as Side,
         price,
         quantity: qty
       };
